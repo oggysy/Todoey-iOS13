@@ -14,7 +14,7 @@ import ChameleonFramework
 class CategoryTableViewController: SwipeTableViewController {
     
     let realm = try! Realm()
-    var categories: Results<Category>?
+    private var categories: Results<Category>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -86,7 +86,7 @@ class CategoryTableViewController: SwipeTableViewController {
     
     
     //MARK: - Data Manipulation Methods
-    func save(category: Category) {
+    private func save(category: Category) {
         do {
             try realm.write {
                 realm.add(category)
@@ -97,7 +97,7 @@ class CategoryTableViewController: SwipeTableViewController {
         tableView.reloadData()
     }
     
-    func loadCategories() {
+    private func loadCategories() {
         categories = realm.objects(Category.self)
         tableView.reloadData()
     }

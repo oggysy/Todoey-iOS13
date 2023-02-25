@@ -11,7 +11,7 @@ import RealmSwift
 import ChameleonFramework
 
 class TodoListViewController: SwipeTableViewController {
-    var todoItems: Results<Item>?
+    private var todoItems: Results<Item>?
     let realm = try! Realm()
     var selectedCategory: Category? {
         didSet{
@@ -46,13 +46,13 @@ class TodoListViewController: SwipeTableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        guard let item = todoItems?[indexPath.row] else {
+        guard let item = todoItems?[indexPath.row] ,let selectedCategory = selectedCategory , let todoItems = todoItems else {
             cell.textLabel?.text = "No Items Added"
             return cell
         }
         cell.textLabel?.text = item.title
         cell.accessoryType = item.done ? .checkmark : .none
-        guard let color = UIColor(hexString: selectedCategory!.color)? .darken(byPercentage:CGFloat(indexPath.row) / CGFloat(todoItems!.count)) else {
+        guard let color = UIColor(hexString: selectedCategory.color)? .darken(byPercentage:CGFloat(indexPath.row) / CGFloat(todoItems.count)) else {
             return cell
         }
         cell.backgroundColor = color
@@ -99,7 +99,7 @@ class TodoListViewController: SwipeTableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    func loadItems() {
+    private func loadItems() {
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         self.tableView.reloadData()
     }
@@ -126,12 +126,11 @@ extension TodoListViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
+        guard searchBar.text?.count == 0 else { return }
             loadItems()
             DispatchQueue.main.async {
                 searchBar.resignFirstResponder()
             }
-        }
     }
 }
 
